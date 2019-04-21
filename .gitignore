@@ -47,3 +47,9 @@ Thumbs.db
 debug
 .vscode
 .idea
+#angular
+Client/package-lock.json
+
+#IDE Goland
+Server/.idea/workspace.xml
+
