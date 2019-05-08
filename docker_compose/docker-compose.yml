@@ -1,0 +1,46 @@
+version: "3"
+services:
+        postgresql:
+                container_name: dc_postgres
+                image: postgres:latest
+                environment:
+                        - POSTGRES_PASSWORD=postgres
+                        - POSTGRES_DB=buddhism
+                volumes:
+                        - ./db_data:/containerdata
+                ports:
+                        - "54321:5432"
+                networks:
+                        docker_bridge:
+                                aliases:
+                                        - postgres_net
+        go_server:
+                depends_on:
+                        - postgresql
+                container_name: dc_go
+                image: alpine/go
+                command: ["./containerdata/wait-for-postgres.sh", "./containerdata/main"]
+                volumes:
+                        - ./go_data:/containerdata
+                ports:
+                        - "9000:9000"
+                networks:
+                        docker_bridge:
+                                aliases:
+                                        - go_container
+        nginx:
+                depends_on:
+                        - go_server
+                container_name: dc_nginx
+                image: alpine/nginx
+                command: ./containerdata/start.sh
+                volumes:
+                        - ./nginx_data:/containerdata
+                ports:
+                        - "443:443"
+                networks:
+                        docker_bridge:
+                                aliases:
+                                        - nginx_net
+networks:
+        docker_bridge:
